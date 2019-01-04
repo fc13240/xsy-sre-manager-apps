@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SRE应用节点管理</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="metisMenu/metisMenu.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
+    <!-- DataTables Responsive CSS -->
+    <link href="/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <script src="jquery/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1>zookeeper地址</h1>
+                        <form id="zkAddForm" role="form" th:action="${action}"  method="post">
+                            <input type="hidden" name="updateId" th:value="${zk.id}">
+                            <div class="form-group">
+                                <label>请输入连接地址逗号隔开</label>
+                                <input type="text" class="form-control" id="connectionString" name="connectionString"
+                                       th:value="${zk.connectionString}"
+                                       placeholder="127.0.0.1:2181,127.0.0.1:2182">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">请输入描述</label>
+                                <input type="text" class="form-control" id="description" name="description"
+                                       th:value="${zk.description}"
+                                       placeholder="zookeeper">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">输入超时时间(ms)</label>
+                                <input type="text" class="form-control" id="sessionTimeout" name="sessionTimeout"
+                                       th:value="${zk.sessionTimeout}"
+                                       placeholder="3000">
+                            </div>
+                            <button type="submit" class="btn btn-default">提交</button>
+                            <button type="reset" onclick="cancel()" class="btn btn-default">取消</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function cancel() {
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    }
+    $(document).ready(function () {
+        var index = parent.layer.getFrameIndex(window.name);
+        $("#zkAddForm").submit(function (envent) {
+            envent.preventDefault();
+
+            var form = $(this);
+            $.ajax({
+                url: form.attr("action"),
+                type: form.attr("method"),
+                data: form.serialize(),
+                dataType: "json",
+                beforeSend: function () {
+                    // $("#ajax-loader").show();
+                },
+                error: function () {
+
+                },
+                complete: function () {
+                    parent.openMenu("zkmain");
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        parent.layer.close(index);
+                    }
+                }
+            });
+
+
+        });
+    });
+</script>
+</body>
+</html>

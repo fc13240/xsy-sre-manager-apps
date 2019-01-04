@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<input id="connectionID" th:value="${id}" type="hidden"/>
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">详情页</h1>
+
+    </div>
+</div>
+
+<!--<div class="row">-->
+<!--<div class="col-lg-12">-->
+<!--<h1 class="page-header">路径导航</h1>-->
+<!--</div>-->
+<!--</div>-->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                子节点统计
+            </div>
+            <div class="panel-body">
+                <div id="nodes"></div>
+            </div>
+            <div class="panel-footer">
+                新增
+                删除
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    节点数据
+                </div>
+                <div class="panel-body">
+                    <h2>Node State</h2>
+                    <div class="row node-state-row">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">czxid</span>
+                                <input id="czxid" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">mzxid</span>
+                                <input id="mzxid" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">ctime</span>
+                                <input id="ctime" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">mtime</span>
+                                <input id="mtime" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">version</span>
+                                <input id="version" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">cversion</span>
+                                <input id="cversion" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">aversion</span>
+                                <input id="aversion" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">dataLength</span>
+                                <input id="dataLength" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">numChildren</span>
+                                <input id="numChildren" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">pzxid</span>
+                                <input id="pzxid" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">scheme</span>
+                                <input id="scheme" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">id</span>
+                                <input id="id" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-12">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">perms</span>
+                                <input id="perms" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row node-state-row">
+                        <div class="col-sm-12">
+                            <div class="input-group">
+                                <span class="input-group-addon node-state-label">ephemeralOwner</span>
+                                <input id="ephemeralOwner" type="text" class="form-control node-state-input" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    节点状态
+                </div>
+                <div class="panel-body">
+                    <h2>Node Data</h2>
+                    <input id="node-fullPath" type="text" hidden>
+                    <form role="form" action="#">
+                        <div class="form-group">
+                            <textarea id="node-data-textarea" class="form-control" rows="12"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <button id="btn-update-data" type="button" class="btn btn-primary">UPDATE</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--<script th:inline="javascript">-->
+<!--var json = [[${tree}]];-->
+
+<script>
+
+    $(function () {
+        // document.oncontextmenu = function(){return false};     //禁止鼠标右键菜单显示
+        // var res = document.getElementById('box');      //找到id为box的div
+        // document.body.onmouseup = function(e){     //在body里点击触发事件
+        //     if(e.button===2){       //如果button=1（鼠标左键），button=2（鼠标右键），button=0（鼠标中间键）
+        //         console.log(e);     //将传进去的参数打印出来
+        //         console.log(e.offsetY);     //打印出鼠标点击的Y轴坐标
+        //         console.log(e.offsetX);     //打印出鼠标点击的X轴坐标
+        //         res.style.top = e.offsetY+'px';     //鼠标点击时给div定位Y轴
+        //         res.style.left = e.offsetX+'px';    //鼠标点击时给div定位X轴
+        //         res.style.display = 'block';        //显示div盒子
+        //     }else{
+        //         res.style.display = 'none';         //否则不显示div盒子
+        //     }
+        //
+        // }
+        var id = $("#connectionID").val();
+        // $.getJSON('/tree', {id: id, path: '/', rnd: Math.random()}, function (data) {
+        //      $('#nodes').treeview({
+        //         data: data,
+        //         onNodeSelected: function (event, node) {
+        //             alert("wocao")
+        //             console.log(node)
+        //             $.getJSON('/node', {id: id, path: node.fullPath, rnd: Math.random()}, function (response) {
+        //                 console.log(response)
+        //                 if (response && 200 === response.status && response.data) {
+        //                     $('#node-fullPath').val(response.data.path);
+        //                     if (response.data.statMetadata) {
+        //
+        //                         $('#czxid').val(response.data.statMetadata.czxid);
+        //                         $('#ctime').val(response.data.statMetadata.ctime);
+        //                         $('#cversion').val(response.data.statMetadata.cversion);
+        //                         $('#aversion').val(response.data.statMetadata.aversion);
+        //                         $('#dataLength').val(response.data.statMetadata.dataLength);
+        //                         $('#ephemeralOwner').val(response.data.statMetadata.ephemeralOwner);
+        //                         $('#mtime').val(response.data.statMetadata.mtime);
+        //                         $('#mzxid').val(response.data.statMetadata.mzxid);
+        //                         $('#numChildren').val(response.data.statMetadata.numChildren);
+        //                         $('#pzxid').val(response.data.statMetadata.pzxid);
+        //                         $('#version').val(response.data.statMetadata.version);
+        //                     }
+        //                     if (response.data.aclMetadata) {
+        //                         $('#id').val(response.data.aclMetadata.id);
+        //                         $('#perms').val(response.data.aclMetadata.perms);
+        //                         $('#scheme').val(response.data.aclMetadata.scheme);
+        //                     }
+        //                     if (response.data.data) {
+        //                         $('#node-data-textarea').val(response.data.data);
+        //                     }
+        //                 } else {
+        //                     toastr.error('Get data info failed for path [' + node.fullPath + ']！', 'Error');
+        //                 }
+        //             });
+        //         }
+        //     });
+        // });
+
+        $.ajax({
+            url: '/tree',
+            type: 'GET', //GET
+            async: false,    //或false,是否异步
+            dataType: "json",
+            data: {id: id, path: '/', rnd: Math.random()},
+            success: function (data) {
+                setTimeout(function(){
+                    $('#nodes').treeview({
+                        data: data,
+                        onNodeSelected: function (event, node) {
+                            alert("wocao")
+                        }
+                    });
+                },1000)
+
+            },
+            error: function (xhr, textStatus) {
+                layer.alert(result.message, {icon: 5});
+            },
+        });
+
+
+    });
+</script>
+</body>
+</html>
