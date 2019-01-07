@@ -4,7 +4,7 @@
 <input id="connectionID" th:value="${id}" type="hidden"/>
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">详情页</h1>
+        <h2 class="page-header">详情页</h2>
 
     </div>
 </div>
@@ -16,17 +16,26 @@
 <!--</div>-->
 <div class="row">
     <div class="col-lg-6">
-        <div class="panel panel-default">
+        <div class="panel panel-default" style="height:500px;">
             <div class="panel-heading">
                 子节点统计
             </div>
-            <div class="panel-body">
-                <div id="nodes"></div>
+            <div class="panel-body pre-scrollable">
+                <div class="row">
+                    <button class="btn btn-primary"
+                            th:onclick="'javascript:addNode()'">
+                        添加
+                    </button>
+                    <button class="btn btn-danger"
+                            th:onclick="'javascript:deleteNode()'">删除
+                    </button>
+                </div>
+                <div class="row">
+                    <div id="nodes"></div>
+                </div>
+
             </div>
-            <div class="panel-footer">
-                新增
-                删除
-            </div>
+
         </div>
     </div>
     <div class="col-lg-6">
@@ -34,6 +43,26 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     节点数据
+                </div>
+                <div class="panel-body">
+                    <h2>Node Data</h2>
+                    <input id="node-fullPath" type="text" hidden>
+                    <form role="form" action="#">
+                        <div class="form-group">
+                            <textarea id="node-data-textarea" class="form-control" rows="12"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <button id="btn-update-data" type="button" class="btn btn-primary">UPDATE</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    节点状态
                 </div>
                 <div class="panel-body">
                     <h2>Node State</h2>
@@ -137,26 +166,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-            </div>
-        </div>
-        <div class="row">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    节点状态
-                </div>
-                <div class="panel-body">
-                    <h2>Node Data</h2>
-                    <input id="node-fullPath" type="text" hidden>
-                    <form role="form" action="#">
-                        <div class="form-group">
-                            <textarea id="node-data-textarea" class="form-control" rows="12"></textarea>
-                        </div>
-                        <div class="input-group">
-                            <button id="btn-update-data" type="button" class="btn btn-primary">UPDATE</button>
-                        </div>
-                    </form>
                 </div>
 
             </div>
@@ -185,66 +195,41 @@
         //
         // }
         var id = $("#connectionID").val();
-        // $.getJSON('/tree', {id: id, path: '/', rnd: Math.random()}, function (data) {
-        //      $('#nodes').treeview({
-        //         data: data,
-        //         onNodeSelected: function (event, node) {
-        //             alert("wocao")
-        //             console.log(node)
-        //             $.getJSON('/node', {id: id, path: node.fullPath, rnd: Math.random()}, function (response) {
-        //                 console.log(response)
-        //                 if (response && 200 === response.status && response.data) {
-        //                     $('#node-fullPath').val(response.data.path);
-        //                     if (response.data.statMetadata) {
-        //
-        //                         $('#czxid').val(response.data.statMetadata.czxid);
-        //                         $('#ctime').val(response.data.statMetadata.ctime);
-        //                         $('#cversion').val(response.data.statMetadata.cversion);
-        //                         $('#aversion').val(response.data.statMetadata.aversion);
-        //                         $('#dataLength').val(response.data.statMetadata.dataLength);
-        //                         $('#ephemeralOwner').val(response.data.statMetadata.ephemeralOwner);
-        //                         $('#mtime').val(response.data.statMetadata.mtime);
-        //                         $('#mzxid').val(response.data.statMetadata.mzxid);
-        //                         $('#numChildren').val(response.data.statMetadata.numChildren);
-        //                         $('#pzxid').val(response.data.statMetadata.pzxid);
-        //                         $('#version').val(response.data.statMetadata.version);
-        //                     }
-        //                     if (response.data.aclMetadata) {
-        //                         $('#id').val(response.data.aclMetadata.id);
-        //                         $('#perms').val(response.data.aclMetadata.perms);
-        //                         $('#scheme').val(response.data.aclMetadata.scheme);
-        //                     }
-        //                     if (response.data.data) {
-        //                         $('#node-data-textarea').val(response.data.data);
-        //                     }
-        //                 } else {
-        //                     toastr.error('Get data info failed for path [' + node.fullPath + ']！', 'Error');
-        //                 }
-        //             });
-        //         }
-        //     });
-        // });
+        $.getJSON('/tree', {id: id, path: '/', rnd: Math.random()}, function (data) {
+            $('#nodes').treeview({
+                data: data,
+                onNodeSelected: function (event, node) {
+                    $.getJSON('/node', {id: id, path: node.fullPath, rnd: Math.random()}, function (response) {
+                        if (response && 200 === response.status && response.data) {
+                            $('#node-fullPath').val(response.data.path);
+                            if (response.data.statMetadata) {
 
-        $.ajax({
-            url: '/tree',
-            type: 'GET', //GET
-            async: false,    //或false,是否异步
-            dataType: "json",
-            data: {id: id, path: '/', rnd: Math.random()},
-            success: function (data) {
-                setTimeout(function(){
-                    $('#nodes').treeview({
-                        data: data,
-                        onNodeSelected: function (event, node) {
-                            alert("wocao")
+                                $('#czxid').val(response.data.statMetadata.czxid);
+                                $('#ctime').val(response.data.statMetadata.ctime);
+                                $('#cversion').val(response.data.statMetadata.cversion);
+                                $('#aversion').val(response.data.statMetadata.aversion);
+                                $('#dataLength').val(response.data.statMetadata.dataLength);
+                                $('#ephemeralOwner').val(response.data.statMetadata.ephemeralOwner);
+                                $('#mtime').val(response.data.statMetadata.mtime);
+                                $('#mzxid').val(response.data.statMetadata.mzxid);
+                                $('#numChildren').val(response.data.statMetadata.numChildren);
+                                $('#pzxid').val(response.data.statMetadata.pzxid);
+                                $('#version').val(response.data.statMetadata.version);
+                            }
+                            if (response.data.aclMetadata) {
+                                $('#id').val(response.data.aclMetadata.id);
+                                $('#perms').val(response.data.aclMetadata.perms);
+                                $('#scheme').val(response.data.aclMetadata.scheme);
+                            }
+                            if (response.data.data) {
+                                $('#node-data-textarea').val(response.data.data);
+                            }
+                        } else {
+                            toastr.error('Get data info failed for path [' + node.fullPath + ']！', 'Error');
                         }
                     });
-                },1000)
-
-            },
-            error: function (xhr, textStatus) {
-                layer.alert(result.message, {icon: 5});
-            },
+                }
+            });
         });
 
 

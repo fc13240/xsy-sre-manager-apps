@@ -20,14 +20,14 @@ public class PathTreeNode {
 	 * bs-treeview属性
 	 */
 	private String text;
-	private String icon;
-	private String selectedIcon;
-	private String color;
-	private String backColor;
-	private String href;
-	private Boolean selectable;
-	private PathTreeState state;
-	private List<String> tags;
+//	private String icon;
+//	private String selectedIcon;
+//	private String color;
+//	private String backColor;
+//	private String href;
+//	private Boolean selectable;
+//	private PathTreeState state;
+//	private List<String> tags;
 	private List<PathTreeNode> nodes;
 
 	public static PathTreeNode createRootNode() {

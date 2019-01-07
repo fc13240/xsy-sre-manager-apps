@@ -1,7 +1,6 @@
 server:
   port: 9902
 
-
 spring:
   thymeleaf:
     cache: false
@@ -12,3 +11,5 @@ security:
   user:
     name: admin
     password: admin
+logging:
+  level: warn

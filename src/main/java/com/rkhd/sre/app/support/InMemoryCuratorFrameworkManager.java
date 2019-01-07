@@ -2,6 +2,7 @@ package com.rkhd.sre.app.support;
 
 import com.google.common.collect.Maps;
 import com.rkhd.sre.app.entity.ZookeeperInfo;
+import com.rkhd.sre.app.utils.CmdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -17,7 +18,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
@@ -67,9 +69,24 @@ public class InMemoryCuratorFrameworkManager implements CuratorFrameworkManager,
 
         @Override
         public void run(RegisterBuild registerBuild) {
-            register(registerBuild);
+            if (isAlive(registerBuild)) {
+                register(registerBuild);
+            }
         }
     };
+
+    private boolean isAlive(RegisterBuild registerBuild) {
+        String[] connections = registerBuild.getZookeeperInfo().getConnectionString().split(",");
+        boolean flag = false;
+        for (int i = 0; i < connections.length; i++) {
+            String ip = connections[i].substring(0, connections[i].indexOf(":"));
+            String port = connections[i].substring(connections[i].indexOf(":") + 1, connections[i].length());
+            int port_ = Integer.parseInt(port);
+            flag = flag | CmdUtil.connect(ip, port_);
+        }
+        return flag;
+
+    }
 
     @Override
     public void registerCuratorFramework(String id, ZookeeperInfo zookeeperInfo) {
@@ -154,6 +171,20 @@ public class InMemoryCuratorFrameworkManager implements CuratorFrameworkManager,
             KEY_COUNT.remove(s);
         }
     };
+
+    @Override
+    public void stop(Set<String> ids) {
+        ids.stream()
+                .forEach(entity -> {
+                    zookeeperConnectionManager.getByKey(entity).setConnectionState(ConnectionState.LOST);
+                    service.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            fixLock.startWork(entity, entity);
+                        }
+                    });
+                });
+    }
 
     /**
      * 删除非connect状态扫描超过三次的连接

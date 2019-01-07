@@ -12,7 +12,6 @@ import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.Charset;
@@ -41,13 +40,16 @@ public class ZookeeperService {
             path = String.format("%s%s", ZookeeperConstant.ROOT_PATH, path);
         }
         CuratorFramework curator = getExistCurator(id);
+        if (curator == null) {
+            return null;
+        }
         List<String> children = curator.getChildren().forPath(path);
         List<PathTreeNode> pathTreeNodeList = new ArrayList<>();
         if (!children.isEmpty()) {
             for (String child : children) {
                 PathTreeNode node = new PathTreeNode();
                 node.setPath(child);
-                node.setHref(String.format("%s%s", "#", node.getPath()));
+//                node.setHref(String.format("%s%s", "#", node.getPath()));
                 node.setText(node.getPath());
                 node.setFullPath(ZookeeperConstant.ROOT_PATH.equals(path) ? String.format("%s%s", path, child)
                         : String.format("%s%s%s", path, ZookeeperConstant.ROOT_PATH, child));
@@ -56,7 +58,7 @@ public class ZookeeperService {
                 if (null == pathTreeNodes || pathTreeNodes.isEmpty()) {
                     PathTreeState state = new PathTreeState();
                     state.setExpanded(Boolean.FALSE);
-                    node.setState(state);
+//                    node.setState(state);
                 } else {
                     node.setNodes(pathTreeNodes);
                 }
@@ -95,6 +97,7 @@ public class ZookeeperService {
         nodeInfo.setData(getNodeData(curator, path));
         return nodeInfo;
     }
+
     private List<ZookeeperAclMetadata> collectAclMetadata(CuratorFramework curator, String path) throws Exception {
         List<ZookeeperAclMetadata> aclMetadata = Lists.newArrayList();
         if (checkNodeExist(curator, path)) {
@@ -130,6 +133,7 @@ public class ZookeeperService {
         }
         return aclMetadata;
     }
+
     private boolean checkNodeExist(CuratorFramework curator, String path) throws Exception {
         return null != curator.checkExists().forPath(path);
     }
@@ -138,6 +142,7 @@ public class ZookeeperService {
         byte[] bytes = curator.getData().forPath(path);
         return new String(bytes, Charset.forName(ZookeeperConstant.CHARSET));
     }
+
     private ZookeeperStatMetadata collectStatMetadata(CuratorFramework curator, String path) throws Exception {
         ZookeeperStatMetadata metadata = new ZookeeperStatMetadata();
         Stat stat = curator.checkExists().forPath(path);
@@ -156,9 +161,14 @@ public class ZookeeperService {
         }
         return metadata;
     }
+
     private CuratorFramework getExistCurator(String id) {
         CuratorFramework curatorFramework = curatorFrameworkManager.getCuratorFramework(id);
-        Assert.notNull(curatorFramework, "CuratorFramework must not be null for id = " + id);
+        if (curatorFramework == null) {
+            zkReset(id);
+            curatorFramework = curatorFrameworkManager.getCuratorFramework(id);
+        }
+//        Assert.notNull(curatorFramework, "CuratorFramework must not be null for id = " + id);
         return curatorFramework;
     }
 
@@ -173,14 +183,14 @@ public class ZookeeperService {
         return ObjectRestResponse.ok();
     }
 
-    public ObjectRestResponse<ZookeeperInfo> update(String updateId,ZookeeperInfo zookeeperInfo) {
+    public ObjectRestResponse<ZookeeperInfo> update(String updateId, ZookeeperInfo zookeeperInfo) {
         if (StringUtils.isEmpty(updateId) || StringUtils.isEmpty(zookeeperInfo.getConnectionString()) || zookeeperInfo.getSessionTimeout() == null) {
             ObjectRestResponse result = new ObjectRestResponse();
             result.setStatus(600);
             result.setMessage("参数错误");
             return result;
         }
-        ZookeeperInfo zk = manager.update(updateId,zookeeperInfo);
+        ZookeeperInfo zk = manager.update(updateId, zookeeperInfo);
         return ObjectRestResponse.ok();
     }
 

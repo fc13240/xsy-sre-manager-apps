@@ -17,4 +17,6 @@ public interface ZookeeperConnectionManager {
     public ZookeeperInfo getByKey(String id);
 
     public void reset(String id);
+
+    public void fixMap();
 }

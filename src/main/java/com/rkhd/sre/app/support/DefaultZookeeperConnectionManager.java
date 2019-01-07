@@ -6,15 +6,15 @@ import com.rkhd.sre.app.utils.SnowflakeIdWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+//@Component
 public class DefaultZookeeperConnectionManager implements ZookeeperConnectionManager, DisposableBean {
     private static final Map<String, ZookeeperInfo> CONNECTION_MAP = Maps.newConcurrentMap();
     @Autowired
@@ -74,6 +74,13 @@ public class DefaultZookeeperConnectionManager implements ZookeeperConnectionMan
         if (zookeeperInfo != null) {
             manager.registerCuratorFramework(id, zookeeperInfo);
         }
+    }
+
+    @Override
+    public void fixMap() {
+        Set<Map.Entry<String, ZookeeperInfo>> keys = CONNECTION_MAP.entrySet();
+        Set<String> deleteKeys = keys.stream().filter(s -> null == s.getValue().getConnectionState()).map(Map.Entry::getKey).collect(Collectors.toSet());
+        manager.stop(deleteKeys);
     }
 
     @Override
