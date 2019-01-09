@@ -1,0 +1,12 @@
+eureka:
+  instance:
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    # docker 部署开启,记得将IP修改为部署所在服务器的外网IP
+    prefer-ip-address: true
+    ip-address: ${MANAGER_APP_LOCAL_HOST:127.0.0.1}
+  client:
+    serviceUrl:
+      #            defaultZone: http://localhost:8761/eureka/
+      # docker 部署开启,记得将IP修改为部署所在服务器的外网IP
+      defaultZone: http://${security.user.name:ingage}:${security.user.password:ingage}@${EUREKA_HOST:discovery.ingageapp.com}:${PORT:8761}/eureka/

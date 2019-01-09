@@ -1,4 +1,4 @@
-package com.rkhd.sre.app.support;
+package com.rkhd.sre.app.support.zookeeper;
 
 import com.rkhd.sre.app.entity.ZookeeperInfo;
 

@@ -21,9 +21,11 @@
     <!-- DataTables Responsive CSS -->
     <link href="/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
 
+    <link href="assets/css/toastr.css" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link href="dist/css/sb-admin-2.css" rel="stylesheet">
-    <link href="assets/css/toastr.css" rel="stylesheet">
+
     <!-- Morris Charts CSS -->
     <link href="morrisjs/morris.css" rel="stylesheet">
 
@@ -46,27 +48,34 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1>zookeeper地址</h1>
-                        <form id="zkAddForm" role="form" th:action="${action}"  method="post">
-                            <input type="hidden" name="updateId" th:value="${zk.id}">
+                        <h1>discovery地址</h1>
+                        <form id="discoveryAddForm" role="form" th:action="${action}"  method="post">
+                            <input type="hidden" name="updateId" th:value="${discovery.id}">
                             <div class="form-group">
-                                <label>请输入连接地址逗号隔开</label>
+                                <label>请输入连接地址</label>
                                 <input type="text" class="form-control" id="connectionString" name="connectionString"
-                                       th:value="${zk.connectionString}"
-                                       placeholder="127.0.0.1:2181,127.0.0.1:2182">
+                                       th:value="${discovery.connectionString}"
+                                       placeholder="127.0.0.1:2181">
                             </div>
                             <div class="form-group">
                                 <label class="control-label">请输入描述</label>
                                 <input type="text" class="form-control" id="description" name="description"
-                                       th:value="${zk.description}"
-                                       placeholder="zookeeper">
+                                       th:value="${discovery.description}"
+                                       placeholder="discovery">
                             </div>
                             <div class="form-group">
-                                <label class="control-label">输入超时时间(ms)</label>
-                                <input type="text" class="form-control" id="sessionTimeout" name="sessionTimeout"
-                                       th:value="${zk.sessionTimeout}"
-                                       placeholder="3000">
+                                <label class="control-label">请输入用户名</label>
+                                <input type="text" class="form-control" id="username" name="username"
+                                       th:value="${discovery.username}"
+                                       placeholder="username">
                             </div>
+                            <div class="form-group">
+                                <label class="control-label">请输入密码</label>
+                                <input type="password" class="form-control" id="password" name="password"
+                                       th:value="${discovery.password}"
+                                       placeholder="password">
+                            </div>
+
                             <button type="submit" class="btn btn-default">提交</button>
                             <button type="reset" onclick="cancel()" class="btn btn-default">取消</button>
                         </form>
@@ -83,7 +92,7 @@
     }
     $(document).ready(function () {
         var index = parent.layer.getFrameIndex(window.name);
-        $("#zkAddForm").submit(function (envent) {
+        $("#discoveryAddForm").submit(function (envent) {
             envent.preventDefault();
 
             var form = $(this);
@@ -99,10 +108,13 @@
 
                 },
                 complete: function () {
-                    parent.openMenu("zkmain");
+                    toastr.success('update data success!', 'Success');
+                    setTimeout(parent.openMenu("discoverymain"), 30);
+
                 },
                 success: function (data) {
                     if (data.status == 200) {
+
                         parent.layer.close(index);
                     }
                 }

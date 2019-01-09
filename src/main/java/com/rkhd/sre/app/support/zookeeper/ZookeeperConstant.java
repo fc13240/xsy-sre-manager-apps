@@ -1,4 +1,4 @@
-package com.rkhd.sre.app.support;
+package com.rkhd.sre.app.support.zookeeper;
 
 
 public class ZookeeperConstant {

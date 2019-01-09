@@ -2,6 +2,8 @@ server:
   port: 9902
 
 spring:
+  profiles:
+    include: eureka
   thymeleaf:
     cache: false
     prefix:
@@ -9,7 +11,12 @@ spring:
     mode: LEGACYHTML5
 security:
   user:
-    name: admin
+    name: ingage
     password: admin
 logging:
   level: warn
+
+zkManager:
+  DefaultZookeeperConnectionManager
+discoveryManager:
+  DefaultDiscoveryConnectionManager

@@ -1,4 +1,4 @@
-package com.rkhd.sre.app.support;
+package com.rkhd.sre.app.support.zookeeper;
 
 import com.google.common.collect.Maps;
 import com.rkhd.sre.app.entity.ZookeeperInfo;

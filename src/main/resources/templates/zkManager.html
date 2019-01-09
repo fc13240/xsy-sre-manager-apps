@@ -20,17 +20,19 @@
             <div class="panel-heading">
                 子节点统计
             </div>
-            <div class="panel-body pre-scrollable">
+            <div class="panel-body ">
                 <div class="row">
-                    <button class="btn btn-primary"
-                            th:onclick="'javascript:addNode()'">
-                        添加
-                    </button>
-                    <button class="btn btn-danger"
-                            th:onclick="'javascript:deleteNode()'">删除
-                    </button>
+                    <div class="col-lg-12">
+                        <button class="btn btn-primary"
+                                onclick="addNode()">
+                            添加
+                        </button>
+                        <button class="btn btn-danger"
+                                onclick="deleteNode()">删除
+                        </button>
+                    </div>
                 </div>
-                <div class="row">
+                <div class="row pre-scrollable">
                     <div id="nodes"></div>
                 </div>
 
@@ -52,7 +54,7 @@
                             <textarea id="node-data-textarea" class="form-control" rows="12"></textarea>
                         </div>
                         <div class="input-group">
-                            <button id="btn-update-data" type="button" class="btn btn-primary">UPDATE</button>
+                            <button onclick="zkUpdateData()" type="button" class="btn btn-primary">UPDATE</button>
                         </div>
                     </form>
                 </div>
@@ -178,24 +180,97 @@
 
 <script>
 
-    $(function () {
-        // document.oncontextmenu = function(){return false};     //禁止鼠标右键菜单显示
-        // var res = document.getElementById('box');      //找到id为box的div
-        // document.body.onmouseup = function(e){     //在body里点击触发事件
-        //     if(e.button===2){       //如果button=1（鼠标左键），button=2（鼠标右键），button=0（鼠标中间键）
-        //         console.log(e);     //将传进去的参数打印出来
-        //         console.log(e.offsetY);     //打印出鼠标点击的Y轴坐标
-        //         console.log(e.offsetX);     //打印出鼠标点击的X轴坐标
-        //         res.style.top = e.offsetY+'px';     //鼠标点击时给div定位Y轴
-        //         res.style.left = e.offsetX+'px';    //鼠标点击时给div定位X轴
-        //         res.style.display = 'block';        //显示div盒子
-        //     }else{
-        //         res.style.display = 'none';         //否则不显示div盒子
-        //     }
-        //
-        // }
+    function zkUpdateData() {
         var id = $("#connectionID").val();
-        $.getJSON('/tree', {id: id, path: '/', rnd: Math.random()}, function (data) {
+        var nodePath = $('#node-fullPath').val();
+        if (id && nodePath) {
+            $.ajax({
+                url: '/addNodeSave',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    id: id,
+                    path: nodePath,
+                    data: $('#node-data-textarea').val()
+                },
+                success: function (response) {
+                    if (response && 200 === response.status) {
+                        toastr.success('Update node data success!', 'Success');
+                        loadData(id, "/");
+                    } else {
+                        toastr.error('Update node data failed!', 'Error');
+                    }
+                }
+            });
+        } else {
+            toastr.error('Update node data failed for path id or nodePath is not found!', 'Error');
+        }
+    }
+
+    function addNode() {
+        var id = $("#connectionID").val();
+        var selectedNode = $('#nodes').treeview('getSelected');
+        if (typeof(selectedNode) === "undefined" || null === selectedNode || selectedNode == "") {
+
+            return false;
+        }
+        var firstNode = selectedNode.shift();
+        var parentPath = firstNode.fullPath;
+        var parentNodeId = firstNode.nodeId;
+        var title = 'Add node for parent path [' + parentPath + ']';
+        layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: 'zkAddNode?parentPath=' + parentPath + '&parentNodeId=' + parentNodeId + "&id=" + id
+        });
+    }
+
+    function deleteNode() {
+        var selectedNode = $('#nodes').treeview('getSelected');
+        if (typeof(selectedNode) === "undefined" || null === selectedNode || selectedNode == "") {
+            toastr.error('You should choose one node to operate!', 'Error');
+            return false;
+        }
+        var firstNode = selectedNode.shift();
+        var nodeId = firstNode.nodeId;
+        var path = firstNode.fullPath;
+        var id = $("#connectionID").val();
+        if (id && path && nodeId) {
+            $.ajax({
+                url: '/zkDeleteNode',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    id: id,
+                    path: path
+                },
+                success: function (response) {
+                    if (response && response.status && 200 === response.status && response.data) {
+                        toastr.success('Delete node successfully！', 'Success');
+                        var intNodeId = parseInt(nodeId);
+                        var tree = $('#path_tree');
+                        tree.treeview('deleteNode', [intNodeId, {silent: true}]);
+                        tree.treeview('unselectNode', [intNodeId, {silent: true}]);
+                        var nodeFullPath = $('#node-fullPath').val();
+                        if (nodeFullPath === path) {
+                            loadData(id, "/");
+                        }
+                        loadData(id, "/");
+                    } else {
+                        toastr.error('Delete node abortively！', 'Error');
+                    }
+                }
+            });
+        } else {
+            toastr.error('Delete node data failed for path id、path or nodeId is not found!', 'Error');
+        }
+    }
+
+    function loadData(id, fullPath) {
+        $.getJSON('/tree', {id: id, path: fullPath, rnd: Math.random()}, function (data) {
             $('#nodes').treeview({
                 data: data,
                 onNodeSelected: function (event, node) {
@@ -232,6 +307,26 @@
             });
         });
 
+    }
+
+    $(function () {
+        // document.oncontextmenu = function(){return false};     //禁止鼠标右键菜单显示
+        // var res = document.getElementById('box');      //找到id为box的div
+        // document.body.onmouseup = function(e){     //在body里点击触发事件
+        //     if(e.button===2){       //如果button=1（鼠标左键），button=2（鼠标右键），button=0（鼠标中间键）
+        //         console.log(e);     //将传进去的参数打印出来
+        //         console.log(e.offsetY);     //打印出鼠标点击的Y轴坐标
+        //         console.log(e.offsetX);     //打印出鼠标点击的X轴坐标
+        //         res.style.top = e.offsetY+'px';     //鼠标点击时给div定位Y轴
+        //         res.style.left = e.offsetX+'px';    //鼠标点击时给div定位X轴
+        //         res.style.display = 'block';        //显示div盒子
+        //     }else{
+        //         res.style.display = 'none';         //否则不显示div盒子
+        //     }
+        //
+        // }
+        var id = $("#connectionID").val();
+        loadData(id, '/');
 
     });
 </script>

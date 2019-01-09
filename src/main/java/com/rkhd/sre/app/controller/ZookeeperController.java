@@ -5,7 +5,7 @@ import com.rkhd.sre.app.entity.PathTreeRoot;
 import com.rkhd.sre.app.entity.ZookeeperInfo;
 import com.rkhd.sre.app.msg.ObjectRestResponse;
 import com.rkhd.sre.app.service.ZookeeperService;
-import com.rkhd.sre.app.support.ZookeeperConstant;
+import com.rkhd.sre.app.support.zookeeper.ZookeeperConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -34,6 +34,34 @@ public class ZookeeperController {
         return "addZkConnectionForm";
     }
 
+    @GetMapping("/zkAddNode")
+    public String addNode(Model model,String parentPath,String parentNodeId,String id) {
+        ZookeeperInfo zookeeperInfo = new ZookeeperInfo();
+        model.addAttribute("zookeeperId", id);
+        model.addAttribute("parentPath", parentPath);
+        model.addAttribute("parentNodeId", parentNodeId);
+        return "addZkNode";
+    }
+
+    @PostMapping(value = "/addNodeSave", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public ObjectRestResponse<Boolean> addNodeSave(@RequestParam(name = "id") String id,
+                                            @RequestParam(name = "path") String path,
+                                            @RequestParam(name = "data", required = false) String data) throws Exception {
+        ObjectRestResponse<Boolean> response = new ObjectRestResponse<>();
+        response.data(service.addNodeSave(id, path, data));
+        return response;
+    }
+
+    @PostMapping(value = "/zkDeleteNode", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public ObjectRestResponse<Boolean> zkDeleteNode(@RequestParam(name = "id") String id,
+                                            @RequestParam(name = "path") String path) throws Exception {
+        ObjectRestResponse<Boolean> response = new ObjectRestResponse<>();
+        response.data(service.deleteNode(id, path));
+        return response;
+    }
+
     @GetMapping("/zkUpdateForm")
     public String zkUpdateForm(Model model, String id) {
         ZookeeperInfo zookeeperInfo = service.getByKey(id);
@@ -43,7 +71,6 @@ public class ZookeeperController {
     }
 
     @GetMapping("/zkManager")
-
     public String zkManager(Model model, String id) {
         model.addAttribute("id", id);
         return "zkManager";

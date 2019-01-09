@@ -1,7 +1,9 @@
-package com.rkhd.sre.app.support;
+package com.rkhd.sre.app.support.zookeeper;
 
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.rkhd.sre.app.entity.ZookeeperInfo;
+import com.rkhd.sre.app.support.ValueSynLock;
 import com.rkhd.sre.app.utils.CmdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
@@ -18,8 +20,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 
@@ -29,8 +30,18 @@ public class InMemoryCuratorFrameworkManager implements CuratorFrameworkManager,
 
     private static final Map<String, CuratorFramework> CURATOR_FRAMEWORK_MAP = Maps.newConcurrentMap();
     private static final Map<String, Integer> KEY_COUNT = Maps.newConcurrentMap();
-    private static ExecutorService service = Executors.newCachedThreadPool();
-    private static ExecutorService regist = Executors.newCachedThreadPool();
+    ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("zk-service-%d").build();
+    ThreadFactory namedThreadFactory2 = new ThreadFactoryBuilder()
+            .setNameFormat("zk-regist-%d").build();
+
+
+    ExecutorService service = new ThreadPoolExecutor(1, 1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+    ExecutorService regist = new ThreadPoolExecutor(1, 1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory2, new ThreadPoolExecutor.AbortPolicy());
 
 
     @Autowired

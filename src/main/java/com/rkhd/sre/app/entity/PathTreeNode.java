@@ -1,6 +1,6 @@
 package com.rkhd.sre.app.entity;
 
-import com.rkhd.sre.app.support.ZookeeperConstant;
+import com.rkhd.sre.app.support.zookeeper.ZookeeperConstant;
 import lombok.Data;
 
 import java.util.List;

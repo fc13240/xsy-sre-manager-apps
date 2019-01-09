@@ -3,10 +3,11 @@ package com.rkhd.sre.app.service;
 import com.google.common.collect.Lists;
 import com.rkhd.sre.app.entity.*;
 import com.rkhd.sre.app.msg.ObjectRestResponse;
-import com.rkhd.sre.app.support.CuratorFrameworkManager;
-import com.rkhd.sre.app.support.ZookeeperConnectionManager;
-import com.rkhd.sre.app.support.ZookeeperConstant;
+import com.rkhd.sre.app.support.zookeeper.CuratorFrameworkManager;
+import com.rkhd.sre.app.support.zookeeper.ZookeeperConnectionManager;
+import com.rkhd.sre.app.support.zookeeper.ZookeeperConstant;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
@@ -34,7 +35,33 @@ public class ZookeeperService {
     public ZookeeperInfo getByKey(String key) {
         return manager.getByKey(key);
     }
-
+    public boolean addNodeSave(String id, String path, String data) throws Exception {
+        CuratorFramework curator = getExistCurator(id);
+        if (checkNodeExist(curator, path)) {
+            return null != curator.setData().forPath(path, data.getBytes(ZookeeperConstant.CHARSET));
+        } else {
+            if (StringUtils.hasLength(data)) {
+                curator.create().creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
+                        .forPath(path, data.getBytes(ZookeeperConstant.CHARSET));
+            } else {
+                curator.create().creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
+                        .forPath(path);
+            }
+            return Boolean.TRUE;
+        }
+    }
+    public boolean deleteNode(String id, String path) throws Exception {
+        CuratorFramework curator = getExistCurator(id);
+        if (checkNodeExist(curator, path)) {
+            curator.delete().deletingChildrenIfNeeded().forPath(path);
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
     public List<PathTreeNode> buildPathTreeNodeListByPath(String id, String path) throws Exception {
         if (!path.startsWith(ZookeeperConstant.ROOT_PATH)) {
             path = String.format("%s%s", ZookeeperConstant.ROOT_PATH, path);
