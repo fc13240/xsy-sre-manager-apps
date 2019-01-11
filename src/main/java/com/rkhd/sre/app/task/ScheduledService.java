@@ -14,8 +14,8 @@ public class ScheduledService {
 
     @Scheduled(cron = "0/15 * * * * ?  ")
     public void task() {
-        log.info(">>>>>>>任务开始<<<<<<<<");
+        log.debug(">>>>>>>任务开始<<<<<<<<");
         manager.fixMap();
-        log.info(">>>>>>>任务结束<<<<<<<<");
+        log.debug(">>>>>>>任务结束<<<<<<<<");
     }
 }

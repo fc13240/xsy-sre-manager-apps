@@ -18,42 +18,26 @@
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-                <!--<div class="table-responsive">-->
-                <!--<table id class="table table-hover">-->
-                <!--<thead>-->
-                <!--<tr>-->
-                <!--<th>instanceId</th>-->
-                <!--<th>名称</th>-->
-                <!--<th>host</th>-->
-                <!--<th>port</th>-->
-                <!--<th>状态</th>-->
-                <!--<th>操作</th>-->
-                <!--</tr>-->
-                <!--</thead>-->
-                <!--<tbody>-->
-                <!--<tr th:each="config : ${list}">-->
-                <!--<td th:text="${config.instanceId}"></td>-->
-                <!--<td th:text="${config.name}"></td>-->
-                <!--<td th:text="${config.host}"></td>-->
-                <!--<td th:text="${config.port}"></td>-->
-                <!--<td th:text="${config.status}"></td>-->
-                <!--<td>-->
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="input-group custom-search-form">
+                            <input type="text" class="form-control" id="discoveryParam" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick="
 
-                <!--<button class="btn btn-info"-->
-                <!--th:onclick="'javascript:manager(\''+${config.id}+'\')'">-->
-                <!--分离-->
-                <!--</button>-->
-                <!--<button class="btn btn-primary"-->
-                <!--th:onclick="'javascript:update(\''+${config.id}+'\')'">-->
-                <!--恢复-->
-                <!--</button>-->
+                                ()">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table id="apps"></table>
+                    </div>
+                </div>
 
-                <!--</td>-->
-                <!--</tr>-->
-                <!--</tbody>-->
-                <!--</table>-->
-                <!--</div>-->
-                <table id="apps"></table>
                 <!-- /.table-responsive -->
             </div>
             <!-- /.panel-body -->
@@ -72,6 +56,17 @@
         initTable(id);
     });
 
+    function search() {
+        var param = $("#discoveryParam").val();
+        var data = $('#apps').bootstrapTable("getData");
+        var newData = data.filter(function (o) {
+            var str = o.app;
+            var flag = str.indexOf(param);
+            return flag != -1;
+        });
+        $('#apps').bootstrapTable('load', newData);
+    }
+
     function operation(value, row, index) {
         var htm = "<button class='btn btn-info' onclick='down(" + JSON.stringify(row) + ")'>分离</button>"
         htm = htm + " <button class='btn btn-primary'onclick='reset(" + JSON.stringify(row) + ")'>恢复</button>"
@@ -79,19 +74,19 @@
     }
 
     function down(row) {
-        var obj={};
-        obj.name=row.name;
-        obj.app=row.app;
-        obj.instanceId=row.instanceId;
+        var obj = {};
+        obj.name = row.name;
+        obj.app = row.app;
+        obj.instanceId = row.instanceId;
 
         $.ajax({
-            url: "/discoveryManager/down/"+id,
+            url: "/discoveryManager/down/" + id,
             type: 'POST', //GET
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(obj),
             dataType: "json",
             success: function (response) {
-                openMenu("/discoveryManager?id="+id);
+                openMenu("/discoveryManager?id=" + id);
             },
             error: function (xhr, textStatus) {
                 layer.alert(result.message, {icon: 5});
@@ -100,17 +95,17 @@
     }
 
     function reset(row) {
-        var obj={};
-        obj.name=row.name;
-        obj.app=row.app;
-        obj.instanceId=row.instanceId;
+        var obj = {};
+        obj.name = row.name;
+        obj.app = row.app;
+        obj.instanceId = row.instanceId;
         $.ajax({
-            url: "/discoveryManager/reset/"+id,
+            url: "/discoveryManager/reset/" + id,
             type: 'POST', //GET
             contentType: 'application/json',
             data: JSON.stringify(obj),
             success: function (data) {
-                openMenu("/discoveryManager?id="+id);
+                openMenu("/discoveryManager?id=" + id);
             },
             error: function (xhr, textStatus) {
                 layer.alert(result.message, {icon: 5});
@@ -140,6 +135,10 @@
                 return temp;
             },
             columns: [{
+                title: 'instanceId',
+                field: 'instanceId',
+                sortable: true
+            },{
                 title: 'app',
                 field: 'app',
                 sortable: true

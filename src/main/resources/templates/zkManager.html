@@ -22,7 +22,7 @@
             </div>
             <div class="panel-body ">
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <button class="btn btn-primary"
                                 onclick="addNode()">
                             添加
@@ -31,9 +31,19 @@
                                 onclick="deleteNode()">删除
                         </button>
                     </div>
+                    <div class="col-lg-6">
+                        <div class="input-group custom-search-form">
+                            <input type="text" class="form-control" id="zkParam" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="zksearch">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="row pre-scrollable">
-                    <div id="nodes"></div>
+                <div id="nodeDiv" class="row " style="padding-top: 5px;">
+                    <div id="nodes" class="pre-scrollable"style="position: relative"></div>
                 </div>
 
             </div>
@@ -179,6 +189,38 @@
 <!--var json = [[${tree}]];-->
 
 <script>
+
+    $(function () {
+        $("#zksearch").on("click", searchzk);
+        $('#zkParam').on('keyup', searchzk);
+    })
+
+    var searchzk = function (e) {
+
+        var pattern = $.trim($('#zkParam').val());
+        var options = {
+            ignoreCase: true,     // case insensitive
+            exactMatch: false,    // like or equals
+            revealResults: true
+        };
+        if (pattern == "" || pattern == "undefinde") {
+            $('#nodes').treeview('collapseAll', {silent: true});
+        }
+        var results = $('#nodes').treeview('search', [pattern, options]);
+        if (results.length > 0) {
+            var param = results[0].nodeId;
+            var offset=0;
+            $("#nodes li").each(function () {
+                var nodeId = $(this).attr("data-nodeid");
+                if (nodeId == param) {
+                    offset = $(this).position().top;
+                    return false;
+                }
+            });
+            $("#nodes").scrollTop(offset);
+        }
+    }
+
 
     function zkUpdateData() {
         var id = $("#connectionID").val();
